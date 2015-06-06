@@ -52,17 +52,28 @@ func (p *UserAgent) googleBot() bool {
 
 // Set the attributes of the receiver as given by the parameters. All the other
 // parameters are set to empty.
-func (p *UserAgent) setSimple(name, version string, bot bool) {
+func (p *UserAgent) setSimple(s section, bot bool) {
 	p.bot = bot
 	if !bot {
 		p.mozilla = ""
 	}
-	p.browser.Name = name
-	p.browser.Version = version
+	p.browser.Name = s.name
+	p.browser.Version = s.version
 	p.browser.Engine = ""
 	p.browser.EngineVersion = ""
-	p.os = ""
-	p.localization = ""
+
+	if len(s.comment) >= 1 {
+		if s.comment[0] == "iPhone" {
+			p.platform = "iPhone"
+			p.mobile = true
+		}
+	}
+
+	if len(s.comment) >= 2 {
+		if strings.HasPrefix(s.comment[1], "iOS") {
+			p.os = s.comment[1]
+		}
+	}
 }
 
 // Fix some values for some weird browsers.
@@ -85,7 +96,7 @@ func (p *UserAgent) checkBot(sections []section) {
 		// Check whether the name has some suspicious "bot" in his name.
 		reg, _ := regexp.Compile("(?i)bot")
 		if reg.Match([]byte(sections[0].name)) {
-			p.setSimple(sections[0].name, "", true)
+			p.setSimple(section{sections[0].name, "", nil}, true)
 			return
 		}
 
@@ -94,12 +105,12 @@ func (p *UserAgent) checkBot(sections []section) {
 			// First of all, this is a bot. Moreover, since it doesn't have the
 			// Mozilla string, we can assume that the name and the version are
 			// the ones from the first section.
-			p.setSimple(sections[0].name, sections[0].version, true)
+			p.setSimple(sections[0], true)
 			return
 		}
 
 		// At this point we are sure that this is not a bot, but some weirdo.
-		p.setSimple(sections[0].name, sections[0].version, false)
+		p.setSimple(sections[0], false)
 	} else {
 		// Let's iterate over the available comments and check for a website.
 		for _, v := range sections {
@@ -110,7 +121,7 @@ func (p *UserAgent) checkBot(sections []section) {
 				if len(results) == 2 {
 					version = results[1]
 				}
-				p.setSimple(results[0], version, true)
+				p.setSimple(section{results[0], version, nil}, true)
 				return
 			}
 		}
