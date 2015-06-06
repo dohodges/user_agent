@@ -63,8 +63,9 @@ func (p *UserAgent) setSimple(s section, bot bool) {
 	p.browser.EngineVersion = ""
 
 	if len(s.comment) >= 1 {
-		if s.comment[0] == "iPhone" {
-			p.platform = "iPhone"
+		switch s.comment[0] {
+		case "iPhone", "iPad":
+			p.platform = s.comment[0]
 			p.mobile = true
 		}
 	}

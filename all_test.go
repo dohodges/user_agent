@@ -103,6 +103,7 @@ var uastrings = []struct {
 
 	// Apps
 	{"iPhoneApp", "myapp/1.2.3 (iPhone; iOS 8.3; Scale/2.00)"},
+	{"iPadApp", "myapp/1.2.3 (iPad; iOS 8.3; Scale/2.00)"},
 }
 
 // Slice of the expected results from the previous slice.
@@ -194,6 +195,7 @@ var expected = []string{
 	"Mozilla:5.0 Platform:Symbian OS:SymbianOS/9.1 Browser:Symbian-413 Engine:AppleWebKit-413 Bot:false Mobile:true",
 
 	"Platform:iPhone OS:iOS 8.3 Browser:myapp-1.2.3 Bot:false Mobile:true",
+	"Platform:iPad OS:iOS 8.3 Browser:myapp-1.2.3 Bot:false Mobile:true",
 }
 
 // Internal: beautify the UserAgent reference into a string so it can be
